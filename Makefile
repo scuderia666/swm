@@ -24,7 +24,7 @@ clean:
 
 dist: clean
 	mkdir -p swm-${VERSION}
-	cp -R Makefile config.mk\
+	cp -R Makefile config.mk \
 		draw.h util.h ${SRC} transient.c swm-${VERSION}
 	tar -cf swm-${VERSION}.tar swm-${VERSION}
 	gzip swm-${VERSION}.tar
