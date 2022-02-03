@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=swm
+Comment=swm
+Exec=swm
+Type=Application
