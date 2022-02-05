@@ -26,16 +26,32 @@ static const char *colors[][3]      = {
 
 /* tagging */
 static const char *tags[] = { "I", "II", "III", "IV" };
+static const char *tagsalt[] = { "1", "2", "3", "4" };
+static const int momentaryalttags = 0; /* 1 means alttags will show only when key is held down*/
+
+static const char *tagsel[][2] = {
+	{ "#ffffff", "#ff0000" },
+	{ "#ffffff", "#ff7f00" },
+	{ "#000000", "#ffff00" },
+	{ "#000000", "#00ff00" },
+	{ "#ffffff", "#0000ff" },
+	{ "#ffffff", "#4b0082" },
+	{ "#ffffff", "#9400d3" },
+	{ "#000000", "#ffffff" },
+	{ "#ffffff", "#000000" },
+};
+
+//static const unsigned int tagalpha[] = { OPAQUE, baralpha };
 
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           1.0,		-1 },
+	/* class      instance    title       tags mask     isfloating   monitor  ignoretransient float xywh, borderpx*/
+	{ "Gimp",     NULL,       NULL,       0,            1,           1.0,		-1, 0, 50,50,500,500,        5},
 	//{ "Firefox",  NULL,       NULL,       1 << 8,       0,           1.0,		-1 },
-	{ "St",	      NULL,       NULL,       0,            0,           defaultopacity, -1},
+	{ "St",	      NULL,       NULL,       0,            1,           0.2, -1, 0, 50,50,500,500,        5},
 };
 
 /* layout(s) */
@@ -71,9 +87,10 @@ static const Layout layouts[] = {
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
+	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} }, \
+	{ Mod1Mask|ShiftMask,           KEY,      swaptags,       {.ui = 1 << TAG} },
 
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+#define cmd(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
 static const char *term[]  = { "st", NULL };
@@ -83,7 +100,7 @@ static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ 0, 							XK_Print,  spawn, 		   SHCMD("maim --select | xclip -selection clipboard -t image/png")},
+	{ 0, 							XK_Print,  spawn, 		   cmd("maim --select | xclip -selection clipboard -t image/png")},
 	{ 0,                       		XK_F12,    togglescratch,    {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_r,      spawn,          {.v = rofi } },
 	{ MODKEY,             			XK_Return, spawn,          {.v = term } },
@@ -97,9 +114,12 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_h,      setcfact,       {.f = +0.25} },
 	{ MODKEY|ShiftMask,             XK_l,      setcfact,       {.f = -0.25} },
 	{ MODKEY|ShiftMask,             XK_o,      setcfact,       {.f =  0.00} },
+	{ MODKEY,                       XK_n,      togglealttag,   {0} },
 	{ MODKEY,                       XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY,             			XK_q,      killclient,     {0} },
+	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
@@ -139,6 +159,15 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,    			XK_9,      incrovgaps,     {.i = -1 } },
 	{ MODKEY,              			XK_0,      togglegaps,     {0} },
 	{ MODKEY|ShiftMask,    			XK_0,      defaultgaps,    {0} },
+	{ Mod1Mask,                       XK_q,      moveplace,      {.ui = WIN_NW }},
+	{ Mod1Mask,                       XK_w,      moveplace,      {.ui = WIN_N  }},
+	{ Mod1Mask,                       XK_e,      moveplace,      {.ui = WIN_NE }},
+	{ Mod1Mask,                       XK_a,      moveplace,      {.ui = WIN_W  }},
+	{ Mod1Mask,                       XK_s,      moveplace,      {.ui = WIN_C  }},
+	{ Mod1Mask,                       XK_d,      moveplace,      {.ui = WIN_E  }},
+	{ Mod1Mask,                       XK_z,      moveplace,      {.ui = WIN_SW }},
+	{ Mod1Mask,                       XK_x,      moveplace,      {.ui = WIN_S  }},
+	{ Mod1Mask,                       XK_c,      moveplace,      {.ui = WIN_SE }},
 };
 
 /* button definitions */
