@@ -9,7 +9,7 @@ static const unsigned int gappov    = 15;
 static const unsigned int gappx     = 12;       /* gap pixel between windows */
 static const int smartgaps          = 1;
 static const int showbar            = 1;        /* 0 means no bar */
-static const int topbar             = 0;        /* 0 means bottom bar */
+static const int topbar             = 1;        /* 0 means bottom bar */
 static const double defaultopacity  = 0.75;
 static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
@@ -51,7 +51,7 @@ static const Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating   monitor  ignoretransient float xywh, borderpx*/
 	{ "Gimp",     NULL,       NULL,       0,            1,           1.0,		-1, 0, 50,50,500,500,        5},
 	//{ "Firefox",  NULL,       NULL,       1 << 8,       0,           1.0,		-1 },
-	{ "St",	      NULL,       NULL,       0,            1,           0.2, -1, 0, 50,50,500,500,        5},
+	//{ "St",	      NULL,       NULL,       0,            1,           0.2, -1, 0, 50,50,500,500,        5},
 };
 
 /* layout(s) */
@@ -93,14 +93,15 @@ static const Layout layouts[] = {
 #define cmd(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static const char *term[]  = { "st", NULL };
+static const char *term[]  = { "kitty", NULL };
 static const char *rofi[] = {"rofi", "-show", "drun", NULL };
 static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
+static const char *scratchpadcmd[] = { "kitty", "--title", scratchpadname, NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ 0, 							XK_Print,  spawn, 		   cmd("maim --select | xclip -selection clipboard -t image/png")},
+	{ MODKEY, 						XK_Print,  spawn, 		   cmd("maim --select ~/ss/$(date +%s).png; cat ~/ss/$(date +%s).png; xclip -selection clipboard -t image/png")},
 	{ 0,                       		XK_F12,    togglescratch,    {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_r,      spawn,          {.v = rofi } },
 	{ MODKEY,             			XK_Return, spawn,          {.v = term } },
@@ -124,6 +125,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
 //	{ MODKEY,                       XK_space,  setlayout,      {0} },
+	{ MODKEY,						XK_comma,  cyclelayout,    {.i = -1 } },
+    { MODKEY,           			XK_period, cyclelayout,    {.i = +1 } },
 	{ MODKEY,             			XK_space,  togglefloating, {0} },
 	{ MODKEY,             			XK_f,      togglefullscr,  {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
@@ -159,15 +162,15 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,    			XK_9,      incrovgaps,     {.i = -1 } },
 	{ MODKEY,              			XK_0,      togglegaps,     {0} },
 	{ MODKEY|ShiftMask,    			XK_0,      defaultgaps,    {0} },
-	{ Mod1Mask,                       XK_q,      moveplace,      {.ui = WIN_NW }},
-	{ Mod1Mask,                       XK_w,      moveplace,      {.ui = WIN_N  }},
-	{ Mod1Mask,                       XK_e,      moveplace,      {.ui = WIN_NE }},
-	{ Mod1Mask,                       XK_a,      moveplace,      {.ui = WIN_W  }},
-	{ Mod1Mask,                       XK_s,      moveplace,      {.ui = WIN_C  }},
-	{ Mod1Mask,                       XK_d,      moveplace,      {.ui = WIN_E  }},
-	{ Mod1Mask,                       XK_z,      moveplace,      {.ui = WIN_SW }},
-	{ Mod1Mask,                       XK_x,      moveplace,      {.ui = WIN_S  }},
-	{ Mod1Mask,                       XK_c,      moveplace,      {.ui = WIN_SE }},
+	{ Mod1Mask,                     XK_q,      moveplace,      {.ui = WIN_NW }},
+	{ Mod1Mask,                     XK_w,      moveplace,      {.ui = WIN_N  }},
+	{ Mod1Mask,                     XK_e,      moveplace,      {.ui = WIN_NE }},
+	{ Mod1Mask,                     XK_a,      moveplace,      {.ui = WIN_W  }},
+	{ Mod1Mask,                     XK_s,      moveplace,      {.ui = WIN_C  }},
+	{ Mod1Mask,                     XK_d,      moveplace,      {.ui = WIN_E  }},
+	{ Mod1Mask,                     XK_z,      moveplace,      {.ui = WIN_SW }},
+	{ Mod1Mask,                     XK_x,      moveplace,      {.ui = WIN_S  }},
+	{ Mod1Mask,                     XK_c,      moveplace,      {.ui = WIN_SE }},
 };
 
 /* button definitions */
@@ -178,7 +181,7 @@ static Button buttons[] = {
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = term } },
-	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
+	{ ClkClientWin,         MODKEY,         Button1,        moveorplace,    {.i = 1} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
 	{ ClkTagBar,            0,              Button1,        view,           {0} },
